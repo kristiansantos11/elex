@@ -1,4 +1,7 @@
 import 'package:elex/Screen/start_menu.dart';
+import 'package:elex/Services/AuthenticationService.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,7 +14,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [],
+      providers: [
+        Provider<AuthenticationService>(
+          create: (_) => AuthenticationService(FirebaseAuth.instance)
+        ),
+      ],
       child: MaterialApp(
         title: 'Eleksyon',
         theme: ThemeData(
