@@ -1,12 +1,18 @@
-import 'package:elex/Screen/start_menu.dart';
+import 'package:elex/Screen/initial_screen.dart';
 import 'package:elex/Services/AuthenticationService.dart';
+import 'package:elex/Services/RouteGenerator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
+import 'package:responsive_framework/responsive_wrapper.dart';
 
-void main() {
-  runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(Phoenix(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -18,13 +24,28 @@ class MyApp extends StatelessWidget {
         Provider<AuthenticationService>(
           create: (_) => AuthenticationService(FirebaseAuth.instance)
         ),
+        StreamProvider(
+          create: (context) => context.read<AuthenticationService>().authStateChanges, initialData: null,
+        ),
       ],
       child: MaterialApp(
-        title: 'Eleksyon',
+        title: 'Elex',
+        builder: (context, widget) => ResponsiveWrapper.builder(
+          BouncingScrollWrapper.builder(context, widget!),
+          maxWidth: 1200,
+          minWidth: 480,
+          defaultScale: true,
+          breakpoints: [
+            ResponsiveBreakpoint.resize(480, name: MOBILE),
+            ResponsiveBreakpoint.autoScale(800, name: TABLET),
+            ResponsiveBreakpoint.resize(1000, name: DESKTOP),
+          ],
+          background: Container(color: Color(0xFFF5F5F5))),
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.red,
         ),
-        home: StartMenu(),
+        initialRoute: InitialScreen.routeName,
+        onGenerateRoute: getGenerateRoute,
       ),
     );
   }
